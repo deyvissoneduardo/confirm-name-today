@@ -8,9 +8,12 @@
  * - hooks.ts (React hooks for data fetching, optional)
  */
 
-// Example: Export feature APIs
-// export * from './features/games';
-// export * from './features/users';
-
 // Re-export the base client
 export * from './client';
+
+// Export feature APIs
+export * from './features/auth';
+export * from './features/users';
+export * from './features/games';
+export * from './features/rankings';
+export * from './features/statistics';

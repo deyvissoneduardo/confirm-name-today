@@ -2,9 +2,9 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import type { User } from '@/lib/mock-data/users';
-import { mockGetCurrentUser } from '@/lib/mock-data/users';
 import type { ReactNode } from 'react';
+import type { User } from '@/lib/api/features/users';
+import { usersService } from '@/lib/api/features/users';
 
 interface AuthContextType {
   user: User | null;
@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const token = localStorage.getItem('auth_token');
       if (token) {
         try {
-          const userData = await mockGetCurrentUser();
+          const userData = await usersService.getMe();
           setUser(userData);
         } catch {
           // User not found or error
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (token: string) => {
     localStorage.setItem('auth_token', token);
-    mockGetCurrentUser().then((userData) => {
+    usersService.getMe().then((userData) => {
       setUser(userData);
       router.push('/');
     });

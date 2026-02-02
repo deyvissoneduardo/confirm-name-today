@@ -16,6 +16,8 @@ export default function RankingsPage() {
   const { user } = useAuth();
   const [selectedType, setSelectedType] = useState<RankingType>('goals');
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [ranking, setRanking] = useState<Ranking | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +49,10 @@ export default function RankingsPage() {
           games={games}
           selectedGameId={selectedGameId}
           onGameChange={setSelectedGameId}
+          selectedMonth={selectedMonth}
+          onMonthChange={setSelectedMonth}
+          selectedDay={selectedDay}
+          onDayChange={setSelectedDay}
         />
 
         <Card>

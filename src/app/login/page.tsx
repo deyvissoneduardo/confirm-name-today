@@ -5,12 +5,25 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
-import { mockLogin } from '@/lib/mock-data/auth';
+import { authService } from '@/lib/api/features/auth';
 import { useAuth } from '@/lib/auth/context';
 
+const SAVED_EMAIL_KEY = 'saved_email';
+const SAVED_PASSWORD_KEY = 'saved_password';
+
+function getSavedEmail(): string {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem(SAVED_EMAIL_KEY) || '';
+}
+
+function getSavedPassword(): string {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem(SAVED_PASSWORD_KEY) || '';
+}
+
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(getSavedEmail);
+  const [password, setPassword] = useState(getSavedPassword);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -19,12 +32,25 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validação de senha
+    if (password.length < 6) {
+      setError('A senha deve ter no mínimo 6 caracteres');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await mockLogin(email, password);
+      const response = await authService.login({ email, password });
       login(response.token);
-    } catch {
+
+      // Salvar credenciais após login bem-sucedido
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(SAVED_EMAIL_KEY, email);
+        localStorage.setItem(SAVED_PASSWORD_KEY, password);
+      }
+    } catch (error) {
       setError('Email ou senha inválidos');
       setIsLoading(false);
     }
@@ -67,6 +93,8 @@ export default function LoginPage() {
                 required
                 placeholder="••••••••"
                 disabled={isLoading}
+                minLength={6}
+                maxLength={100}
               />
               <button
                 type="button"
@@ -75,6 +103,17 @@ export default function LoginPage() {
               >
                 {showPassword ? 'Ocultar' : 'Mostrar'}
               </button>
+              {password.length > 0 && (
+                <div className="mt-1 text-xs">
+                  <span
+                    className={
+                      password.length >= 6 ? 'text-[#10b981]' : 'text-[#ef4444]'
+                    }
+                  >
+                    {password.length}/6 caracteres mínimos
+                  </span>
+                </div>
+              )}
             </div>
 
             <Button type="submit" disabled={isLoading} className="w-full mt-2">

@@ -16,6 +16,8 @@ export default function StatisticsPage() {
   const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,6 +53,10 @@ export default function StatisticsPage() {
           games={games}
           selectedGameId={selectedGameId}
           onGameChange={setSelectedGameId}
+          selectedMonth={selectedMonth}
+          onMonthChange={setSelectedMonth}
+          selectedDay={selectedDay}
+          onDayChange={setSelectedDay}
         />
 
         {isLoading ? (

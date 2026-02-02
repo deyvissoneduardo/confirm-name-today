@@ -6,8 +6,8 @@ import { Card } from '@/components/ui/Card';
 import { ProfileView } from '@/components/profile/ProfileView';
 import { ProfileEdit } from '@/components/profile/ProfileEdit';
 import { useAuth } from '@/lib/auth/context';
-import { mockGetCurrentUser, mockUpdateUser } from '@/lib/mock-data/users';
-import type { User } from '@/lib/mock-data/users';
+import { usersService } from '@/lib/api/features/users';
+import type { User, UpdateUserRequest } from '@/lib/api/features/users';
 
 export default function ProfilePage() {
   const { user: _authUser } = useAuth();
@@ -19,7 +19,7 @@ export default function ProfilePage() {
     const fetchUser = async () => {
       setIsLoading(true);
       try {
-        const userData = await mockGetCurrentUser();
+        const userData = await usersService.getMe();
         setUser(userData);
       } catch (error) {
         console.error('Error fetching user:', error);
@@ -31,12 +31,12 @@ export default function ProfilePage() {
     fetchUser();
   }, []);
 
-  const handleSave = async (data: Partial<User>) => {
+  const handleSave = async (data: UpdateUserRequest) => {
     if (!user) return;
 
     setIsLoading(true);
     try {
-      const updatedUser = await mockUpdateUser(user.id, data);
+      const updatedUser = await usersService.update(user.id, data);
       setUser(updatedUser);
       setIsEditing(false);
     } catch (error) {

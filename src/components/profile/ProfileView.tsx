@@ -3,7 +3,7 @@
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
-import type { User } from '@/lib/mock-data/users';
+import type { User } from '@/lib/api/features/users';
 
 interface ProfileViewProps {
   user: User;

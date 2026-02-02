@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import type { User } from '@/lib/mock-data/users';
+import type { User, UpdateUserRequest } from '@/lib/api/features/users';
 
 interface ProfileEditProps {
   user: User;
-  onSave: (data: Partial<User>) => void;
+  onSave: (data: UpdateUserRequest) => void;
   onCancel: () => void;
 }
 
@@ -41,10 +41,10 @@ export function ProfileEdit({
     setIsLoading(true);
 
     try {
-      const updateData: Partial<User> = {
+      const updateData: UpdateUserRequest = {
         fullName,
         email,
-        photo: photo || null,
+        photo: photo || undefined,
       };
 
       if (password.trim()) {
@@ -58,6 +58,7 @@ export function ProfileEdit({
           setIsLoading(false);
           return;
         }
+        updateData.password = password;
       }
 
       onSave(updateData);
