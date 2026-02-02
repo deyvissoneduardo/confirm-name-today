@@ -15,7 +15,7 @@ export interface LoginResponse {
   };
 }
 
-export interface ApiError {
+export interface AuthApiError {
   timestamp: string;
   status: number;
   error: string;

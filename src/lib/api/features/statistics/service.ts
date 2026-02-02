@@ -1,6 +1,6 @@
 import { api } from '@/lib/api/client';
 import { USE_MOCK_DATA } from '@/lib/api/config';
-import type { UserStatistics } from './types';
+import type { UserStatistics } from '../users/types';
 import { mockGetStatistics } from '@/lib/mock-data/statistics';
 
 export const statisticsService = {
