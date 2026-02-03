@@ -1,8 +1,3 @@
-/**
- * API Client Base Configuration
- * Centralized HTTP client for API requests
- */
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export type ApiError = {
@@ -37,9 +32,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
   const data = isJson ? await response.json() : await response.text();
 
   if (!response.ok) {
-    // Tratar erros específicos
     if (response.status === 401) {
-      // Token expirado ou inválido
       if (typeof window !== 'undefined') {
         localStorage.removeItem('auth_token');
         window.location.href = '/login';
@@ -67,42 +60,30 @@ export async function apiClient<T>(
 ): Promise<T> {
   const { params, ...fetchOptions } = options;
 
-  // Build URL with query parameters
-  // Remove leading slash from endpoint if present to avoid double slashes
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
 
-  // Normalize base URL
   const baseUrl = API_BASE_URL.endsWith('/')
     ? API_BASE_URL.slice(0, -1)
     : API_BASE_URL;
 
-  // Construct full URL
-  // If baseUrl is absolute (starts with http:// or https://), use it directly
-  // Otherwise, it's a relative path and we need to prepend the origin in browser
   let fullUrl: string;
   if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) {
-    // Absolute URL
     fullUrl = `${baseUrl}/${cleanEndpoint}`;
   } else {
-    // Relative URL - need origin in browser context
     if (typeof window !== 'undefined') {
       fullUrl = `${window.location.origin}${baseUrl}/${cleanEndpoint}`;
     } else {
-      // Server-side: use baseUrl as-is (Next.js will handle it)
       fullUrl = `${baseUrl}/${cleanEndpoint}`;
     }
   }
 
-  // Create URL object - ensure it's absolute
   let url: URL;
   try {
     url = new URL(fullUrl);
   } catch {
-    // If URL construction fails, try with window.location.origin as base
     if (typeof window !== 'undefined') {
       url = new URL(fullUrl, window.location.origin);
     } else {
-      // Fallback: construct manually
       url = new URL(`http://localhost${fullUrl}`);
     }
   }
@@ -113,13 +94,11 @@ export async function apiClient<T>(
     });
   }
 
-  // Default headers
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(fetchOptions.headers as Record<string, string>),
   };
 
-  // Adicionar token ao header se disponível
   const token = getAuthToken();
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -130,7 +109,6 @@ export async function apiClient<T>(
     headers,
   };
 
-  // Debug: log da requisição em desenvolvimento
   if (process.env.NODE_ENV === 'development') {
     console.log('[API Client]', {
       method: config.method || 'GET',
@@ -143,7 +121,6 @@ export async function apiClient<T>(
   try {
     const response = await fetch(url.toString(), config);
 
-    // Debug: log da resposta em desenvolvimento
     if (process.env.NODE_ENV === 'development') {
       console.log('[API Response]', {
         url: url.toString(),
@@ -154,7 +131,6 @@ export async function apiClient<T>(
 
     return handleResponse<T>(response);
   } catch (error) {
-    // Debug: log de erro em desenvolvimento
     if (process.env.NODE_ENV === 'development') {
       console.error('[API Error]', {
         url: url.toString(),
@@ -171,7 +147,6 @@ export async function apiClient<T>(
   }
 }
 
-// Convenience methods
 export const api = {
   get: <T>(endpoint: string, options?: RequestOptions) =>
     apiClient<T>(endpoint, { ...options, method: 'GET' }),
