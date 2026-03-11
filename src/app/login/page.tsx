@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
@@ -28,6 +29,24 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const errorCode = searchParams.get('error');
+    if (!errorCode) return;
+
+    if (errorCode === 'session') {
+      ('Não foi possível carregar seus dados. Faça login novamente.');
+    }
+
+    if (errorCode === 'autologin') {
+      ('Conta criada com sucesso. Faça login para continuar.');
+    }
+
+    if (typeof window !== 'undefined') {
+      window.history.replaceState({}, '', '/login');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

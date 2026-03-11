@@ -29,7 +29,16 @@ type RequestOptions = RequestInit & {
 async function handleResponse<T>(response: Response): Promise<T> {
   const contentType = response.headers.get('content-type');
   const isJson = contentType?.includes('application/json');
-  const data = isJson ? await response.json() : await response.text();
+  const raw = await response.text();
+  let data: unknown = raw;
+
+  if (isJson && raw) {
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      data = raw;
+    }
+  }
 
   if (!response.ok) {
     if (response.status === 401) {
@@ -39,9 +48,25 @@ async function handleResponse<T>(response: Response): Promise<T> {
       }
     }
 
-    const error: ApiError = isJson
-      ? data
-      : { message: data || response.statusText };
+    let message = response.statusText || 'Request failed';
+    let errors: Record<string, string[]> | undefined;
+
+    if (isJson && data && typeof data === 'object') {
+      const maybeError = data as Partial<ApiError> & {
+        error?: string;
+        detail?: string;
+      };
+      message =
+        maybeError.message || maybeError.error || maybeError.detail || message;
+      errors = maybeError.errors;
+    } else if (typeof data === 'string' && data.trim()) {
+      message = data;
+    }
+
+    const error: ApiError = {
+      message,
+      errors,
+    };
     error.status = response.status;
     throw new ApiClientError(error.message, error.status, error.errors);
   }

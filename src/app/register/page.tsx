@@ -107,13 +107,21 @@ export default function RegisterPage() {
         profile: 'JOGADOR',
         photo: photoData,
       });
-
-      // Fazer login automaticamente após registro
-      const loginResponse = await authService.login({ email, password });
-      login(loginResponse.token);
     } catch (error) {
       setError('Erro ao criar conta. Tente novamente.');
       setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Fazer login automaticamente após registro
+      const loginResponse = await authService.login({ email, password });
+      login(loginResponse.token);
+    } catch {
+      setIsLoading(false);
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login?error=autologin';
+      }
     }
   };
 

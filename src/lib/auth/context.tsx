@@ -29,7 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const userData = await usersService.getMe();
           setUser(userData);
         } catch {
-          // User not found or error
+          localStorage.removeItem('auth_token');
+          setUser(null);
         }
       }
       setIsLoading(false);
@@ -40,10 +41,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (token: string) => {
     localStorage.setItem('auth_token', token);
-    usersService.getMe().then((userData) => {
-      setUser(userData);
-      router.push('/');
-    });
+    usersService
+      .getMe()
+      .then((userData) => {
+        setUser(userData);
+        router.push('/');
+      })
+      .catch(() => {
+        localStorage.removeItem('auth_token');
+        setUser(null);
+        router.push('/login?error=session');
+      });
   };
 
   const logout = () => {
