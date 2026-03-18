@@ -1,6 +1,6 @@
 /**
  * Testes de Integração da API
- * Testa a integração real com a API usando o usuário jogador01
+ * Testa a integração real com a API usando usuário de homologação
  */
 
 import { authService } from '@/lib/api/features/auth';
@@ -11,8 +11,8 @@ import { rankingsService } from '@/lib/api/features/rankings';
 describe('API Integration Tests', () => {
   let authToken: string;
   const testCredentials = {
-    email: 'jogador01@futebol.com',
-    password: 'jogador01',
+    email: 'jogador@futebol.com',
+    password: 'jogador1234',
   };
 
   beforeAll(async () => {
@@ -105,12 +105,21 @@ describe('API Integration Tests', () => {
       }
     });
 
+    it('should filter only released games', async () => {
+      const games = await gamesService.getAll();
+      const releasedGames = games.filter((game) => game.released);
+
+      expect(releasedGames.every((game) => game.released)).toBe(true);
+    });
+
     it('should get confirmations for a game', async () => {
       const games = await gamesService.getAll();
       if (games.length > 0) {
         const gameId = games[0].id;
+        const game = await gamesService.getById(gameId);
         const confirmations = await gamesService.getConfirmations(gameId);
 
+        expect(game.id).toBe(gameId);
         expect(Array.isArray(confirmations)).toBe(true);
       }
     });

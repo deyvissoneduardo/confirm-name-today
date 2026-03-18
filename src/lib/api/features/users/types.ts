@@ -13,7 +13,7 @@ export interface CreateUserRequest {
   fullName: string;
   email: string;
   password: string;
-  profile: string;
+  profile?: string;
   photo?: string;
 }
 

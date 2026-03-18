@@ -2,7 +2,8 @@ import { api } from '@/lib/api/client';
 import { USE_MOCK_DATA } from '@/lib/api/config';
 import type { Game, Confirmation, CreateConfirmationRequest } from './types';
 import {
-  mockGetActiveGame,
+  mockGetAllGames,
+  mockGetGameById,
   mockGetConfirmations,
   mockCreateConfirmation,
 } from '@/lib/mock-data/games';
@@ -10,9 +11,15 @@ import {
 export const gamesService = {
   getAll: async (): Promise<Game[]> => {
     if (USE_MOCK_DATA) {
-      return mockGetActiveGame();
+      return mockGetAllGames();
     }
     return api.get<Game[]>('/games');
+  },
+  getById: async (gameId: string): Promise<Game> => {
+    if (USE_MOCK_DATA) {
+      return mockGetGameById(gameId);
+    }
+    return api.get<Game>(`/games/${gameId}`);
   },
 
   getConfirmations: async (gameId: string): Promise<Confirmation[]> => {

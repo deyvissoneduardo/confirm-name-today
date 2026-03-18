@@ -5,15 +5,14 @@ import { ProtectedLayout } from '@/components/layout/ProtectedLayout';
 import { Card } from '@/components/ui/Card';
 import { ProfileView } from '@/components/profile/ProfileView';
 import { ProfileEdit } from '@/components/profile/ProfileEdit';
-import { useAuth } from '@/lib/auth/context';
 import { usersService } from '@/lib/api/features/users';
 import type { User, UpdateUserRequest } from '@/lib/api/features/users';
 
 export default function ProfilePage() {
-  const { user: _authUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -22,7 +21,11 @@ export default function ProfilePage() {
         const userData = await usersService.getMe();
         setUser(userData);
       } catch (error) {
-        console.error('Error fetching user:', error);
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível carregar o perfil.'
+        );
       } finally {
         setIsLoading(false);
       }
@@ -36,11 +39,17 @@ export default function ProfilePage() {
 
     setIsLoading(true);
     try {
-      const updatedUser = await usersService.update(user.id, data);
-      setUser(updatedUser);
+      void data;
+      setErrorMessage(
+        'Edição de perfil não disponível para jogador nesta API.'
+      );
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating user:', error);
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Erro ao atualizar perfil. Tente novamente.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +63,9 @@ export default function ProfilePage() {
     return (
       <ProtectedLayout title="Perfil">
         <Card>
-          <div className="text-[#a3a3a3]">Carregando perfil...</div>
+          <div className="text-[#a3a3a3]">
+            {errorMessage || 'Carregando perfil...'}
+          </div>
         </Card>
       </ProtectedLayout>
     );
@@ -65,7 +76,9 @@ export default function ProfilePage() {
       <ProtectedLayout title="Perfil">
         <Card>
           <div className="text-center py-8">
-            <p className="text-[#a3a3a3]">Usuário não encontrado.</p>
+            <p className="text-[#a3a3a3]">
+              {errorMessage || 'Usuário não encontrado.'}
+            </p>
           </div>
         </Card>
       </ProtectedLayout>
@@ -75,6 +88,11 @@ export default function ProfilePage() {
   return (
     <ProtectedLayout title="Perfil">
       <div className="flex flex-col gap-6 pb-20 lg:pb-0">
+        {errorMessage && (
+          <Card>
+            <div className="text-[#ef4444]">{errorMessage}</div>
+          </Card>
+        )}
         {isEditing ? (
           <ProfileEdit
             user={user}

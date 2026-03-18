@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/Card';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
-import type { RankingItem as RankingItemType } from '@/lib/mock-data/rankings';
+import type { RankingItem as RankingItemType } from '@/lib/api/features/rankings';
 
 interface RankingItemProps {
   item: RankingItemType;

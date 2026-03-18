@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import type { Game } from '@/lib/mock-data/games';
+import type { Game } from '@/lib/api/features/games';
 
 interface GameCardProps {
   game: Game;
@@ -11,13 +11,14 @@ interface GameCardProps {
 export function GameCard({ game }: Readonly<GameCardProps>) {
   const gameDate = new Date(game.gameDate);
   const dateFormatted = new Intl.DateTimeFormat('pt-BR', {
-    day: 'numeric',
-    month: 'long',
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
   }).format(gameDate);
   const timeFormatted = new Intl.DateTimeFormat('pt-BR', {
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
   }).format(gameDate);
 
   return (
@@ -29,11 +30,11 @@ export function GameCard({ game }: Readonly<GameCardProps>) {
         </Badge>
       </div>
       <div className="flex flex-col gap-2">
-        <div className="text-sm text-[#a3a3a3]">Data</div>
+        <div className="text-sm text-[#a3a3a3]">Data:</div>
         <div className="text-base font-medium text-[#ededed]">
           {dateFormatted}
         </div>
-        <div className="text-sm text-[#a3a3a3]">Hora</div>
+        <div className="text-sm text-[#a3a3a3]">Início do jogo:</div>
         <div className="text-base font-medium text-[#ededed]">
           {timeFormatted}
         </div>

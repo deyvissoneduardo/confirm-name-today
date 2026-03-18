@@ -7,10 +7,10 @@ import { RankingTabs } from '@/components/rankings/RankingTabs';
 import { RankingItem } from '@/components/rankings/RankingItem';
 import { GameFilter } from '@/components/rankings/GameFilter';
 import { useAuth } from '@/lib/auth/context';
-import { mockGetRanking } from '@/lib/mock-data/rankings';
-import { mockGetAllGames } from '@/lib/mock-data/games';
-import type { Ranking, RankingType } from '@/lib/mock-data/rankings';
-import type { Game } from '@/lib/mock-data/games';
+import { rankingsService } from '@/lib/api/features/rankings';
+import type { RankingResponse, RankingType } from '@/lib/api/features/rankings';
+import { gamesService } from '@/lib/api/features/games';
+import type { Game } from '@/lib/api/features/games';
 
 export default function RankingsPage() {
   const { user } = useAuth();
@@ -19,7 +19,7 @@ export default function RankingsPage() {
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [games, setGames] = useState<Game[]>([]);
-  const [ranking, setRanking] = useState<Ranking | null>(null);
+  const [ranking, setRanking] = useState<RankingResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,8 +27,8 @@ export default function RankingsPage() {
       setIsLoading(true);
       try {
         const [rankingData, gamesData] = await Promise.all([
-          mockGetRanking(selectedType, selectedGameId),
-          mockGetAllGames(),
+          rankingsService.get(selectedType),
+          gamesService.getAll(),
         ]);
         setRanking(rankingData);
         setGames(gamesData);
