@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
@@ -22,31 +21,40 @@ function getSavedPassword(): string {
   return localStorage.getItem(SAVED_PASSWORD_KEY) || '';
 }
 
+function getInitialErrorMessage(): string {
+  if (typeof window === 'undefined') return '';
+
+  const params = new URLSearchParams(window.location.search);
+  const errorCode = params.get('error');
+
+  if (errorCode === 'session') {
+    return 'Não foi possível carregar seus dados. Faça login novamente.';
+  }
+
+  if (errorCode === 'autologin') {
+    return 'Conta criada com sucesso. Faça login para continuar.';
+  }
+
+  return '';
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState(getSavedEmail);
   const [password, setPassword] = useState(getSavedPassword);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(getInitialErrorMessage);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const errorCode = searchParams.get('error');
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(window.location.search);
+    const errorCode = params.get('error');
     if (!errorCode) return;
 
-    if (errorCode === 'session') {
-      ('Não foi possível carregar seus dados. Faça login novamente.');
-    }
-
-    if (errorCode === 'autologin') {
-      ('Conta criada com sucesso. Faça login para continuar.');
-    }
-
-    if (typeof window !== 'undefined') {
-      window.history.replaceState({}, '', '/login');
-    }
-  }, [searchParams]);
+    window.history.replaceState({}, '', '/login');
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +77,7 @@ export default function LoginPage() {
         localStorage.setItem(SAVED_EMAIL_KEY, email);
         localStorage.setItem(SAVED_PASSWORD_KEY, password);
       }
-    } catch (error) {
+    } catch {
       setError('Email ou senha inválidos');
       setIsLoading(false);
     }
