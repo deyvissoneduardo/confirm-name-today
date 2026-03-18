@@ -33,7 +33,6 @@ describe('API Client', () => {
     it('should have required methods', () => {
       expect(usersService.getMe).toBeDefined();
       expect(usersService.create).toBeDefined();
-      expect(usersService.update).toBeDefined();
       expect(usersService.getStatistics).toBeDefined();
     });
   });
@@ -41,6 +40,7 @@ describe('API Client', () => {
   describe('Games Service', () => {
     it('should have required methods', () => {
       expect(gamesService.getAll).toBeDefined();
+      expect(gamesService.getById).toBeDefined();
       expect(gamesService.getConfirmations).toBeDefined();
       expect(gamesService.createConfirmation).toBeDefined();
     });

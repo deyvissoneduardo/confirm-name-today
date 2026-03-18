@@ -1,9 +1,9 @@
 import Image from 'next/image';
 import { Card } from '@/components/ui/Card';
-import type { Statistics } from '@/lib/mock-data/statistics';
+import type { UserStatistics } from '@/lib/api/features/users';
 
 interface StatisticsCardProps {
-  statistics: Statistics;
+  statistics: UserStatistics;
   userName?: string;
   userPhoto?: string | null;
 }

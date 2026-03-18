@@ -6,14 +6,14 @@ import { Card } from '@/components/ui/Card';
 import { StatisticsCard } from '@/components/statistics/StatisticsCard';
 import { GameFilter } from '@/components/statistics/GameFilter';
 import { useAuth } from '@/lib/auth/context';
-import { mockGetStatistics } from '@/lib/mock-data/statistics';
-import { mockGetAllGames } from '@/lib/mock-data/games';
-import type { Statistics } from '@/lib/mock-data/statistics';
-import type { Game } from '@/lib/mock-data/games';
+import { statisticsService } from '@/lib/api/features/statistics';
+import { gamesService } from '@/lib/api/features/games';
+import type { UserStatistics } from '@/lib/api/features/users';
+import type { Game } from '@/lib/api/features/games';
 
 export default function StatisticsPage() {
   const { user } = useAuth();
-  const [statistics, setStatistics] = useState<Statistics | null>(null);
+  const [statistics, setStatistics] = useState<UserStatistics | null>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
@@ -30,8 +30,8 @@ export default function StatisticsPage() {
 
       try {
         const [stats, gamesData] = await Promise.all([
-          mockGetStatistics(user.id, selectedGameId),
-          mockGetAllGames(),
+          statisticsService.getMe(),
+          gamesService.getAll(),
         ]);
         setStatistics(stats);
         setGames(gamesData);

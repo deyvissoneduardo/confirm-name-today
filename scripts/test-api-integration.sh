@@ -6,8 +6,8 @@
 # Não usar set -e para permitir tratamento de erros personalizado
 
 API_URL="http://localhost:8080/api"
-EMAIL="jogador01@futebol.com"
-PASSWORD="jogador01"
+EMAIL="jogador@futebol.com"
+PASSWORD="jogador1234"
 
 # Cores para output
 RED='\033[0;31m'

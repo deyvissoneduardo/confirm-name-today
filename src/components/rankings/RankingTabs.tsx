@@ -1,6 +1,6 @@
 'use client';
 
-import type { RankingType } from '@/lib/mock-data/rankings';
+import type { RankingType } from '@/lib/api/features/rankings';
 
 interface RankingTabsProps {
   selectedType: RankingType;

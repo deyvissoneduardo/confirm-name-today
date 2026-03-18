@@ -5,11 +5,12 @@ import { useParams } from 'next/navigation';
 import { ProtectedLayout } from '@/components/layout/ProtectedLayout';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { mockGetGameById, mockGetConfirmations } from '@/lib/mock-data/games';
 import { useAuth } from '@/lib/auth/context';
 import { ConfirmationForm } from '@/components/games/ConfirmationForm';
 import { ConfirmationList } from '@/components/games/ConfirmationList';
-import type { Game, Confirmation } from '@/lib/mock-data/games';
+import { ApiClientError } from '@/lib/api/client';
+import { gamesService } from '@/lib/api/features/games';
+import type { Game, Confirmation } from '@/lib/api/features/games';
 
 export default function ConfirmPage() {
   const params = useParams();
@@ -17,21 +18,27 @@ export default function ConfirmPage() {
   const gameId = params.gameId as string;
   const [game, setGame] = useState<Game | null>(null);
   const [confirmations, setConfirmations] = useState<Confirmation[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      setErrorMessage('');
       try {
-        const gameData = await mockGetGameById(gameId);
+        const gameData = await gamesService.getById(gameId);
         setGame(gameData);
 
         if (user?.id) {
-          const userConfirmations = await mockGetConfirmations(gameId, user.id);
+          const userConfirmations = await gamesService.getConfirmations(gameId);
           setConfirmations(userConfirmations);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        if (error instanceof ApiClientError) {
+          setErrorMessage(error.message);
+        } else {
+          setErrorMessage('Não foi possível carregar as confirmações.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -48,7 +55,9 @@ export default function ConfirmPage() {
     return (
       <ProtectedLayout title="Confirmar Presença">
         <Card>
-          <div className="text-[#a3a3a3]">Carregando...</div>
+          <div className="text-[#a3a3a3]">
+            {errorMessage || 'Carregando...'}
+          </div>
         </Card>
       </ProtectedLayout>
     );
@@ -59,7 +68,9 @@ export default function ConfirmPage() {
       <ProtectedLayout title="Confirmar Presença">
         <Card>
           <div className="text-center py-8">
-            <p className="text-[#a3a3a3]">Jogo não encontrado.</p>
+            <p className="text-[#a3a3a3]">
+              {errorMessage || 'Jogo não encontrado.'}
+            </p>
           </div>
         </Card>
       </ProtectedLayout>

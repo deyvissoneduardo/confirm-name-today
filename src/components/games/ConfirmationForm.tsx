@@ -5,8 +5,9 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { mockCreateConfirmation } from '@/lib/mock-data/games';
-import type { Game, Confirmation } from '@/lib/mock-data/games';
+import { ApiClientError } from '@/lib/api/client';
+import { gamesService } from '@/lib/api/features/games';
+import type { Game, Confirmation } from '@/lib/api/features/games';
 
 interface ConfirmationFormProps {
   game: Game;
@@ -39,16 +40,20 @@ export function ConfirmationForm({
     setIsLoading(true);
 
     try {
-      const confirmation = await mockCreateConfirmation(
-        game.id,
-        confirmedName.trim(),
-        isGuest
-      );
+      const confirmation = await gamesService.createConfirmation(game.id, {
+        confirmedName: confirmedName.trim(),
+        isGuest,
+      });
       setConfirmedName('');
       setIsGuest(false);
       onConfirm(confirmation);
-    } catch {
-      setError('Erro ao confirmar presença. Tente novamente.');
+      setIsLoading(false);
+    } catch (error) {
+      if (error instanceof ApiClientError) {
+        setError(error.message);
+      } else {
+        setError('Erro ao confirmar presença. Tente novamente.');
+      }
       setIsLoading(false);
     }
   };

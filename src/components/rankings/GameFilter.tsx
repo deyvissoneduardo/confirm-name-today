@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import type { Game } from '@/lib/mock-data/games';
+import type { Game } from '@/lib/api/features/games';
 
 export type FilterMode = 'total' | 'month' | 'day';
 

@@ -1,26 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import {
-  mockCreateConfirmation,
-  mockGetConfirmations,
-} from '@/lib/mock-data/games';
-import type { Game, Confirmation } from '@/lib/mock-data/games';
+import { ApiClientError } from '@/lib/api/client';
+import { gamesService } from '@/lib/api/features/games';
+import type { Game, Confirmation } from '@/lib/api/features/games';
 
 interface ConfirmationCardProps {
   game: Game;
-  userId: string;
 }
 
-export function ConfirmationCard({
-  game,
-  userId,
-}: Readonly<ConfirmationCardProps>) {
+export function ConfirmationCard({ game }: Readonly<ConfirmationCardProps>) {
   const [confirmedName, setConfirmedName] = useState('');
   const [isGuest, setIsGuest] = useState(false);
   const [error, setError] = useState('');
@@ -29,13 +23,16 @@ export function ConfirmationCard({
 
   const gameDate = new Date(game.gameDate);
   const dateFormatted = new Intl.DateTimeFormat('pt-BR', {
-    day: 'numeric',
-    month: 'long',
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
+    timeZone: 'UTC',
   }).format(gameDate);
   const timeFormatted = new Intl.DateTimeFormat('pt-BR', {
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
+    timeZone: 'UTC',
   }).format(gameDate);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,28 +52,21 @@ export function ConfirmationCard({
     setIsLoading(true);
 
     try {
-      const newConfirmation = await mockCreateConfirmation(
-        game.id,
-        confirmedName.trim(),
-        isGuest
-      );
+      const newConfirmation = await gamesService.createConfirmation(game.id, {
+        confirmedName: confirmedName.trim(),
+        isGuest,
+      });
       setConfirmation(newConfirmation);
       setConfirmedName('');
       setIsGuest(false);
-    } catch {
-      setError('Erro ao confirmar presença. Tente novamente.');
       setIsLoading(false);
-    }
-  };
-
-  const handleLoadConfirmation = async () => {
-    try {
-      const confirmations = await mockGetConfirmations(game.id, userId);
-      if (confirmations.length > 0) {
-        setConfirmation(confirmations[0]);
+    } catch (error) {
+      if (error instanceof ApiClientError) {
+        setError(error.message);
+      } else {
+        setError('Erro ao confirmar presença. Tente novamente.');
       }
-    } catch {
-      // Error loading confirmation
+      setIsLoading(false);
     }
   };
 
@@ -88,14 +78,18 @@ export function ConfirmationCard({
             Confirmar Presença
           </h3>
           <Badge variant={game.released ? 'success' : 'error'}>
-            {game.released ? 'Lista Liberada' : 'Lista Bloqueada'}
+            {game.released ? 'Lista liberada' : 'Lista bloqueada'}
           </Badge>
         </div>
 
         <div className="flex flex-col gap-2">
-          <div className="text-sm text-[#a3a3a3]">Data do Jogo</div>
+          <div className="text-sm text-[#a3a3a3]">Data:</div>
           <div className="text-base font-medium text-[#ededed]">
-            {dateFormatted} às {timeFormatted}
+            {dateFormatted}
+          </div>
+          <div className="text-sm text-[#a3a3a3]">Início do jogo:</div>
+          <div className="text-base font-medium text-[#ededed]">
+            {timeFormatted}
           </div>
         </div>
 
@@ -169,9 +163,13 @@ export function ConfirmationCard({
       </div>
 
       <div className="flex flex-col gap-2">
-        <div className="text-sm text-[#a3a3a3]">Data do Jogo</div>
+        <div className="text-sm text-[#a3a3a3]">Data:</div>
         <div className="text-base font-medium text-[#ededed]">
-          {dateFormatted} às {timeFormatted}
+          {dateFormatted}
+        </div>
+        <div className="text-sm text-[#a3a3a3]">Início do jogo:</div>
+        <div className="text-base font-medium text-[#ededed]">
+          {timeFormatted}
         </div>
       </div>
 

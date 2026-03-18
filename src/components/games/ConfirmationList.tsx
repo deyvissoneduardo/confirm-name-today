@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import type { Confirmation } from '@/lib/mock-data/games';
+import type { Confirmation } from '@/lib/api/features/games';
 
 interface ConfirmationListProps {
   confirmations: Confirmation[];

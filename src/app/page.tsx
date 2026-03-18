@@ -5,24 +5,43 @@ import { ProtectedLayout } from '@/components/layout/ProtectedLayout';
 import { Card } from '@/components/ui/Card';
 import { ConfirmationCard } from '@/components/games/ConfirmationCard';
 import { useAuth } from '@/lib/auth/context';
-import { mockGetActiveGame } from '@/lib/mock-data/games';
-import type { Game } from '@/lib/mock-data/games';
+import { ApiClientError } from '@/lib/api/client';
+import { gamesService } from '@/lib/api/features/games';
+import type { Game } from '@/lib/api/features/games';
 
 export default function HomePage() {
   const { user } = useAuth();
   const [activeGame, setActiveGame] = useState<Game | null>(null);
+  const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchGame = async () => {
       setIsLoading(true);
+      setErrorMessage('');
       try {
-        const games = await mockGetActiveGame();
+        const games = await gamesService.getAll();
+        const sortedGames = [...games].sort(
+          (a, b) =>
+            new Date(a.gameDate).getTime() - new Date(b.gameDate).getTime()
+        );
+        const nextUnreleasedGame = sortedGames.find((game) => !game.released);
+        const nextGame = nextUnreleasedGame || sortedGames[0];
+
+        if (nextGame) {
+          setActiveGame(nextGame);
+          return;
+        }
+
         if (games.length > 0) {
           setActiveGame(games[0]);
         }
       } catch (error) {
-        console.error('Error fetching game:', error);
+        if (error instanceof ApiClientError) {
+          setErrorMessage(error.message);
+        } else {
+          setErrorMessage('Não foi possível carregar os jogos no momento.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -47,8 +66,12 @@ export default function HomePage() {
           <Card>
             <div className="text-[#a3a3a3]">Carregando jogo ativo...</div>
           </Card>
+        ) : errorMessage ? (
+          <Card>
+            <div className="text-[#ef4444]">{errorMessage}</div>
+          </Card>
         ) : activeGame && user?.id ? (
-          <ConfirmationCard game={activeGame} userId={user.id} />
+          <ConfirmationCard game={activeGame} />
         ) : null}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
