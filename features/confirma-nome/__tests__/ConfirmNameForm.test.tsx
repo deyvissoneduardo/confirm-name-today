@@ -74,7 +74,9 @@ describe("ConfirmNameForm", () => {
     await user.click(screen.getByRole("button", { name: "Confirmar" }));
 
     expect(confirmNameMock).toHaveBeenCalledWith("Carlos", "carlos");
-    expect(await screen.findByText("Nome salvo com sucesso.")).toBeDefined();
+    expect(
+      await screen.findByText("Nome confirmado e salvo com sucesso."),
+    ).toBeDefined();
   });
 
   it("não salva novamente quando o nome já existe e mostra duplicidade", async () => {
@@ -88,7 +90,9 @@ describe("ConfirmNameForm", () => {
 
     expect(confirmNameMock).toHaveBeenCalledWith("Carlos", "carlos");
     expect(
-      await screen.findByText("Esse nome já existe. Use outro nome."),
+      await screen.findByText(
+        "Esse nome já foi confirmado. Escolha outro nome.",
+      ),
     ).toBeDefined();
   });
 

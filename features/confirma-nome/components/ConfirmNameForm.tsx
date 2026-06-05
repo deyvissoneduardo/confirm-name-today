@@ -68,16 +68,26 @@ export function ConfirmNameForm() {
             <span>Ler regras</span>
           </Link>
           {message ? (
-            <p
+            <div
               className={
                 message.type === "success"
-                  ? "rounded-2xl bg-emerald-400/10 px-4 py-3 text-sm leading-5 text-emerald-200 ring-1 ring-emerald-300/20"
-                  : "rounded-2xl bg-red-400/10 px-4 py-3 text-sm leading-5 text-red-200 ring-1 ring-red-300/20"
+                  ? "flex items-start gap-3 rounded-2xl border-l-4 border-emerald-300 bg-emerald-500/25 px-4 py-3 text-sm font-semibold leading-5 text-emerald-50 shadow-lg shadow-emerald-950/30 ring-1 ring-emerald-200/40"
+                  : "flex items-start gap-3 rounded-2xl border-l-4 border-[#FF2C2C] bg-[#FF2C2C]/25 px-4 py-3 text-sm font-semibold leading-5 text-red-50 shadow-lg shadow-red-950/30 ring-1 ring-[#FF2C2C]/40"
               }
               role="status"
             >
-              {message.text}
-            </p>
+              <span
+                aria-hidden="true"
+                className={
+                  message.type === "success"
+                    ? "flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-300 text-xs font-black text-emerald-950"
+                    : "flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FF2C2C] text-xs font-black text-white"
+                }
+              >
+                {message.type === "success" ? "OK" : "!"}
+              </span>
+              <span>{message.text}</span>
+            </div>
           ) : null}
         </div>
       </form>

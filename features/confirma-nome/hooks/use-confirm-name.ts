@@ -8,8 +8,9 @@ import { confirmName } from "../services/confirm-name-service";
 import type { ConfirmNameMessage } from "../types/confirm-name";
 import { validateName } from "../validators/name-validator";
 
-const DUPLICATED_NAME_MESSAGE = "Esse nome já existe. Use outro nome.";
-const SUCCESS_MESSAGE = "Nome salvo com sucesso.";
+const DUPLICATED_NAME_MESSAGE =
+  "Esse nome já foi confirmado. Escolha outro nome.";
+const SUCCESS_MESSAGE = "Nome confirmado e salvo com sucesso.";
 const FIREBASE_CONFIG_ERROR_MESSAGE =
   "Configuração do Firebase incompleta. Verifique as variáveis de ambiente.";
 const FIREBASE_ERROR_MESSAGE =

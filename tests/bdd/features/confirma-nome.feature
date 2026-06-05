@@ -27,7 +27,7 @@ Feature: Confirmar nome
     When ele preencher o nome "Carlos"
     And clicar no botão confirmar
     Then o nome não deve ser salvo novamente
-    And deve visualizar a mensagem "Esse nome já existe. Use outro nome."
+    And deve visualizar a mensagem "Esse nome já foi confirmado. Escolha outro nome."
 
   Scenario: Erro ao consultar Firebase
     Given que o usuário acessou a página de confirmação de nome
